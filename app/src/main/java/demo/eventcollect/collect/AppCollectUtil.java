@@ -375,12 +375,11 @@ public class AppCollectUtil {
      * check whether the json array is full(10 pic)
      */
     private void bufferFullSend() {
-        LogUtil.d("mArray = " + mArray.toString());
         if (dataSizeSend <= mArray.length()) {
             sendData(mArray);
             //发送
-//            mObserved.notifyDataChanged("User Experience Log :" + mArray.toString());
-            //mArray = new JSONArray();
+            LogUtil.d("发送数据 = " + mArray.toString());
+            mArray = new JSONArray();
         }
     }
 }
