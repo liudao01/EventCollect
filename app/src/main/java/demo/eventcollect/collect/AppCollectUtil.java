@@ -32,6 +32,7 @@ import demo.eventcollect.collect.data.DataCollector;
 
 public class AppCollectUtil {
     private static final String TAG = "AppCollectUtil";
+
     /**
      * AppCollectUtil单例
      */
@@ -375,6 +376,8 @@ public class AppCollectUtil {
      * check whether the json array is full(10 pic)
      */
     private void bufferFullSend() {
+        //判断是否
+
         if (dataSizeSend <= mArray.length()) {
             sendData(mArray);
             //发送
