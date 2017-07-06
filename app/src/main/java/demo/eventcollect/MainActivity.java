@@ -1,13 +1,14 @@
 package demo.eventcollect;
 
+import android.Manifest;
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import demo.eventcollect.collect.LogUtil;
+import demo.eventcollect.collect.util.PermissionHelper;
 
 /**
  * @author liuml.
@@ -17,20 +18,50 @@ import demo.eventcollect.collect.LogUtil;
 public class MainActivity extends BaseActivity {
 
 
-
     private TextView textView;
     private Button button;
     private Button buttonActivity;
     private ImageView image;
+    private Button buttonAttribute;
 
+    PermissionHelper mHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        titleTextV ="首页";//标题
+        titleTextV = "首页";//标题
+        buttonAttribute = (Button) findViewById(R.id.button_attribute);
+        mHelper = new PermissionHelper(this);
+        buttonAttribute.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                appCollectUtil.attributeCollect("book", "nihao", MainActivity.this);
+            }
+        });
+        getPermissiolList();
+
         initView();
 
+    }
+
+    private void getPermissiolList() {
+        mHelper.requestPermissions("请授予xx[手机信息]，[读写]权限！",
+                new PermissionHelper.PermissionListener() {
+                    @Override
+                    public void doAfterGrand(String... permission) {
+
+                    }
+
+                    @Override
+                    public void doAfterDenied(String... permission) {
+//                        getPermissiolList();
+                    }
+                }, Manifest.permission.READ_PHONE_STATE, Manifest.permission.READ_PHONE_STATE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE
+        );
     }
 
     private void initView() {
@@ -46,28 +77,5 @@ public class MainActivity extends BaseActivity {
         });
     }
 
-
-
-    /**
-     * @explain 重写dispatchTouchEvent
-     * @author liuml.
-     * @time 2017/6/22 15:24
-     */
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent ev) {
-
-        /**
-         * collect view interaction data, i.e. button clicked.
-         */
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss:SSS");
-//        String date = sdf.format(new java.util.Date());
-//        LogUtil.d("开始时间 : " + date);
-        appCollectUtil.getInstance().recognizeViewEvent(ev, this.getWindow()
-                .getDecorView(), this);
-//        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss:SSS");
-//        String date2 = sdf2.format(new java.util.Date());
-//        LogUtil.d("结束时间 : " + date2);//自己项目测试大约1 - 8毫秒 可以接受
-        return super.dispatchTouchEvent(ev);
-    }
 
 }

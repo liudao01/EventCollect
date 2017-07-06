@@ -84,6 +84,20 @@ public class DataCollector {
         JSONObject object = ButtonUtil.buttonInfoGenerated(target, title, tag, activityName);
         return InsertJSONObject(object, array);
     }
+    /**
+     * 用户交互数据收集 button点击行为收集
+     * button clicked data
+     *
+     * @param attributes 自定义事件标识
+     * @param title button字面标题 info in the button;
+     * @param activityName  button 所在activity activity which the button in;
+     * @param array 待插入的json列表 Json Array;
+     * @return 插好的json列表 Finished Json Array;
+     */
+    public JSONArray attributeDataCollect(String attributes, String title,  String activityName, JSONArray array) {
+        JSONObject object = ButtonUtil.attributeGenerated(attributes, title,  activityName);
+        return InsertJSONObject(object, array);
+    }
 
     /**
      * ImageView点击动作收集

@@ -332,6 +332,21 @@ public class AppCollectUtil {
     }
 
     /**
+     * 自定义事件
+     * User data obtaining(Button);
+     *
+     * @param buttonId 自定义的标识
+     * @param title    button上的字面内容; button content;
+     * @param context
+     */
+    public void attributeCollect(String buttonId, String title, Context context) {
+        synchronized (LOCK) {
+            mArray = mCollector.attributeDataCollect(buttonId, title, context.toString(), mArray);
+            bufferFullSend();
+        }
+    }
+
+    /**
      * 通过用户动作的范围查找相应的View
      * find view that the user interacts.
      *

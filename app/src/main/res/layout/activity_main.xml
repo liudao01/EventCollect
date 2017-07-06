@@ -24,23 +24,35 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:text="点击收集数据" />
+
+    <Button
+        android:id="@+id/button_attribute"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/button"
+        android:layout_toRightOf="@+id/button"
+        android:text="自定义事件" />
+
     <Button
         android:id="@+id/button_activity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="点击跳转页面"
+        android:layout_alignEnd="@+id/textView"
         android:layout_alignParentTop="true"
         android:layout_alignRight="@+id/textView"
-        android:layout_alignEnd="@+id/textView" />
+        android:text="点击跳转页面" />
 
     <ImageView
         android:id="@+id/image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@mipmap/ic_launcher"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
-
+        android:layout_marginEnd="21dp"
+        android:layout_marginRight="21dp"
+        android:layout_toLeftOf="@+id/button_activity"
+        android:layout_toStartOf="@+id/button_activity"
+        android:background="@mipmap/ic_launcher" />
 
 
 </RelativeLayout>
