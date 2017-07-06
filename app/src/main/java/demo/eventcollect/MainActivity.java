@@ -36,7 +36,6 @@ public class MainActivity extends BaseActivity {
         buttonAttribute.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 appCollectUtil.attributeCollect("book", "nihao", MainActivity.this);
             }
         });

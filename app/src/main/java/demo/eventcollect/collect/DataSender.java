@@ -150,6 +150,7 @@ public class DataSender {
             e.printStackTrace();
         }
         //发送数据
+        LogUtil.d("最终发送的数据 = " + jsonData.toString());
     }
 
     private JSONObject putUserData() {
