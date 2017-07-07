@@ -139,11 +139,12 @@ public class DataSender {
     public void sendData(JSONArray array) {
         JSONObject jsonData = new JSONObject();
         JSONObject userdata = putUserData();
-        JSONObject session;
+        JSONObject session = putSession();
         mActionArray = array;
         try {
             jsonData.put("userData", userdata);
             jsonData.put("events", mActionArray);
+            jsonData.put("session", session);
 
 
         } catch (JSONException e) {
@@ -151,6 +152,27 @@ public class DataSender {
         }
         //发送数据
         LogUtil.d("最终发送的数据 = " + jsonData.toString());
+    }
+
+    //id 我随便写一个
+    private JSONObject putSession() {
+        JSONObject obj = new JSONObject();
+        try {
+            long time = System.currentTimeMillis();
+            if (!TextUtils.isEmpty(getUserid())) {
+                obj.put("id", time + "_" + getUserid());
+            } else {
+                obj.put("id", time + "_" + getMyUUID());
+            }
+            obj.put("time", time);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return obj;
+    }
+
+    private String getUserid() {
+        return "1951868";
     }
 
     private JSONObject putUserData() {
@@ -183,7 +205,7 @@ public class DataSender {
     }
 
     /**
-     * 封装用户位置信息
+     * 封装用户位置信息  假数据
      */
     private void putUserLoaction() {//这块用你自己定位的数据
         HashMap<String, Object> UserLoaction = new HashMap<>();
