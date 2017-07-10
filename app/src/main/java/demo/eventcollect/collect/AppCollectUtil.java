@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Stack;
 
-import demo.eventcollect.collect.data.DataCollector;
+import demo.eventcollect.collect.collector.DataCollector;
 
 
 /**

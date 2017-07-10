@@ -15,7 +15,7 @@ import demo.eventcollect.collect.util.PermissionHelper;
  * @explain 主页面
  * @time 2017/6/28 16:41
  */
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
 
 
     private TextView textView;
@@ -23,6 +23,7 @@ public class MainActivity extends BaseActivity {
     private Button buttonActivity;
     private ImageView image;
     private Button buttonAttribute;
+
 
     PermissionHelper mHelper;
 
@@ -74,7 +75,17 @@ public class MainActivity extends BaseActivity {
                 LogUtil.d("点击了图片");
             }
         });
+
+        buttonActivity.setOnClickListener(this);
     }
 
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.button_activity:
+                startActivity(TestActivity.class);
+                break;
+        }
+    }
 }

@@ -1,4 +1,4 @@
-package demo.eventcollect.collect.data;
+package demo.eventcollect.collect.collector;
 
 import android.content.Context;
 import android.util.Log;
