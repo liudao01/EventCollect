@@ -397,6 +397,7 @@ public class AppCollectUtil {
             sendData(mArray);
             //发送
             LogUtil.d("发送数据 = " + mArray.toString());
+            mArray = null;
             mArray = new JSONArray();
         }
     }

@@ -10,19 +10,28 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.v4.content.SharedPreferencesCompat;
 
+import org.json.JSONArray;
+
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import demo.eventcollect.MyApplication;
 
 /**
- * @explain sp 工具类
  * @author liuml.
+ * @explain sp 工具类
  * @time 2017/6/30 14:41
  */
 public class SPUtils {
 
+    private static final String STRING_ARRAY = "KEY_ARRAY";
+    private static final String CHANNELSET = "channelSet";
     public static String FILLNAME = "config";
+
+    private static SharedPreferences mySharedPreferences = MyApplication.getInstance().getSharedPreferences(FILLNAME, Context.MODE_PRIVATE);
+    private static SharedPreferences.Editor editor = mySharedPreferences.edit();
 
     /**
      * 存入某个key对应的value值
@@ -33,7 +42,7 @@ public class SPUtils {
     public static void put(String key, Object value) {
         Context context = MyApplication.getInstance();
         SharedPreferences sp = context.getSharedPreferences(FILLNAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor edit = sp.edit();
+        SharedPreferences.Editor edit = mySharedPreferences.edit();
         if (value instanceof String) {
             edit.putString(key, (String) value);
         } else if (value instanceof Integer) {
@@ -112,4 +121,39 @@ public class SPUtils {
         SharedPreferencesCompat.EditorCompat.getInstance().apply(edit);
     }
 
+    public static void saveStringArray(String[] stringArray) {
+        JSONArray jsonArray = new JSONArray();
+        for (String b : stringArray) {
+            jsonArray.put(b);
+        }
+        editor.putString(STRING_ARRAY, jsonArray.toString());
+        editor.commit();
+    }
+
+    public static String[] getStringArray(int arrayLength) {
+        String[] resArray = new String[arrayLength];
+        Arrays.fill(resArray, true);
+        try {
+            JSONArray jsonArray = new JSONArray(mySharedPreferences.getString(STRING_ARRAY, "[]"));
+            for (int i = 0; i < jsonArray.length(); i++) {
+                resArray[i] = jsonArray.getString(i);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return resArray;
+    }
+
+    public static void addSet(String string) {
+        HashSet channelSet = new HashSet<String>();
+        channelSet.add(string);
+        editor.putStringSet(CHANNELSET, channelSet);
+        editor.commit();
+    }
+
+    public static HashSet getSet() {
+        Set<String> stringSet = mySharedPreferences.getStringSet(CHANNELSET, null);
+        return (HashSet) stringSet;
+    }
 }

@@ -4,8 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.os.Handler;
-import android.os.Message;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
@@ -15,6 +13,9 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.UUID;
+
+import demo.eventcollect.MyApplication;
+import demo.eventcollect.collect.util.ACache;
 
 
 /**
@@ -152,6 +153,48 @@ public class DataSender {
         }
         //发送数据
         LogUtil.d("最终发送的数据 = " + jsonData.toString());
+        //这里联网请求数据
+
+    }
+
+    /**
+     * 发送数据接口
+     *
+     * @param array json动作列表
+     * @param isLocation 是否是本地数据
+     */
+    public void sendData(JSONArray array,boolean isLocation) {
+        JSONObject jsonData = new JSONObject();
+        JSONObject userdata = putUserData();
+        JSONObject session = putSession();
+        mActionArray = array;
+        try {
+            jsonData.put("userData", userdata);
+            jsonData.put("events", mActionArray);
+            jsonData.put("session", session);
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        //发送数据
+        LogUtil.d("最终发送的数据 = " + jsonData.toString());
+        //这里联网请求数据
+        send(jsonData,isLocation);
+
+    }
+
+    //发送 自己些网络发送的数据
+    private void send(JSONObject jsonData ,boolean isLocation) {
+
+        boolean isSuccess = true;
+
+        /*
+        发送========== 成功
+         */
+
+
+
     }
 
     //id 我随便写一个
@@ -247,22 +290,6 @@ public class DataSender {
         return resultData;
     }
 
-    /**
-     * 数据发送返回处理
-     * Returned data
-     */
-    private Handler mHandler = new Handler(new Handler.Callback() {
-
-        @Override
-        public boolean handleMessage(Message msg) {
-            if (msg.what == 1) {
-                parseResult("成功的数据");
-            } else {
-                responseFailed("msg.what is 0");
-            }
-            return false;
-        }
-    });
 
     private void parseResult(String data) {
         try {
@@ -276,7 +303,7 @@ public class DataSender {
             if ("0".equals(resultCode)) {
                 responseSuccess();
             } else {
-                responseFailed(resultCode);
+                responseFailed(object,resultCode);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -290,8 +317,14 @@ public class DataSender {
 
     }
 
-    private void responseFailed(String resultCode) {
+    private void responseFailed(JSONObject jsonObject,String resultCode) {
         //数据发送失败
+        ACache aCache = ACache.get(MyApplication.getContext());
+
+//        SPUtils.addSet();
+//        aCache.put()
+//        aCache.get()
+
     }
 
 }
