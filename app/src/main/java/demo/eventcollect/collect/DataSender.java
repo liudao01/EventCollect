@@ -208,7 +208,7 @@ public class DataSender {
         /*
         发送========== 成功 是本地 删除 不是本地 不管
          */
-        MySend mySend = new MySend(jsonData,key);
+        MySend mySend = new MySend(jsonData, key);
         Thread thread = new Thread(mySend);
         thread.start();
 
@@ -348,6 +348,8 @@ public class DataSender {
 
     //模拟发送网络请求
     class MySend implements Runnable {
+
+        boolean isSuccess = true;
         JSONObject jsonData;
         String key;
 
@@ -361,6 +363,22 @@ public class DataSender {
 
             try {
                 Thread.sleep(500);
+
+                if (isSuccess) {
+                    if (TextUtils.isEmpty(key)) {
+
+                    } else {
+                        //删除本地数据
+                    }
+
+                } else {
+                    if (TextUtils.isEmpty(key)) {
+
+                    } else {
+
+                    }
+
+                }
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
