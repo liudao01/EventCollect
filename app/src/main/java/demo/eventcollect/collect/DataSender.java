@@ -12,10 +12,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.UUID;
 
 import demo.eventcollect.MyApplication;
 import demo.eventcollect.collect.util.ACache;
+import demo.eventcollect.collect.util.SPUtils;
 
 
 /**
@@ -26,6 +29,7 @@ import demo.eventcollect.collect.util.ACache;
 public class DataSender {
 
 
+    Thread thread;
     /**
      * 环境变量封装HashMap  userdata
      * <p>
@@ -62,6 +66,7 @@ public class DataSender {
     private Application mContext;
 
     private JSONObject userData;
+    private ACache aCache;
 
     /**
      * 初始化DataSender
@@ -72,6 +77,7 @@ public class DataSender {
         mParams = new HashMap<String, Object>();
         mContext = application;
         userData = new JSONObject();
+        aCache = ACache.get(MyApplication.getContext());
     }
 
     /**
@@ -138,6 +144,16 @@ public class DataSender {
      * @param array json动作列表
      */
     public void sendData(JSONArray array) {
+        //判断本地是否有数据
+        HashSet set = SPUtils.getSet();
+
+        for (Iterator<String> iter = set.iterator(); iter.hasNext(); ) {
+            String str = (String) iter.next();
+            LogUtil.d("本地数据key", str);
+            JSONObject asJSONObject = aCache.getAsJSONObject(str);
+            LogUtil.d("本地发送的数据 = " + asJSONObject.toString());
+        }
+        //
         JSONObject jsonData = new JSONObject();
         JSONObject userdata = putUserData();
         JSONObject session = putSession();
@@ -160,10 +176,10 @@ public class DataSender {
     /**
      * 发送数据接口
      *
-     * @param array json动作列表
+     * @param array      json动作列表
      * @param isLocation 是否是本地数据
      */
-    public void sendData(JSONArray array,boolean isLocation) {
+    public void sendData(JSONArray array, boolean isLocation) {
         JSONObject jsonData = new JSONObject();
         JSONObject userdata = putUserData();
         JSONObject session = putSession();
@@ -180,20 +196,21 @@ public class DataSender {
         //发送数据
         LogUtil.d("最终发送的数据 = " + jsonData.toString());
         //这里联网请求数据
-        send(jsonData,isLocation);
+        send(jsonData, "");
 
     }
 
     //发送 自己些网络发送的数据
-    private void send(JSONObject jsonData ,boolean isLocation) {
+    private void send(JSONObject jsonData, String key) {
 
         boolean isSuccess = true;
 
         /*
-        发送========== 成功
+        发送========== 成功 是本地 删除 不是本地 不管
          */
-
-
+        MySend mySend = new MySend(jsonData,key);
+        Thread thread = new Thread(mySend);
+        thread.start();
 
     }
 
@@ -303,7 +320,7 @@ public class DataSender {
             if ("0".equals(resultCode)) {
                 responseSuccess();
             } else {
-                responseFailed(object,resultCode);
+                responseFailed(object, resultCode);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -317,14 +334,37 @@ public class DataSender {
 
     }
 
-    private void responseFailed(JSONObject jsonObject,String resultCode) {
+    private void responseFailed(JSONObject jsonObject, String resultCode) {
         //数据发送失败
-        ACache aCache = ACache.get(MyApplication.getContext());
-
-//        SPUtils.addSet();
-//        aCache.put()
+        long time = System.currentTimeMillis();
+//        Set set = new HashSet();
+        String key = String.valueOf(time);
+//        set.add(key);
+        SPUtils.addSet(key);
+        aCache.put(key, jsonObject);
 //        aCache.get()
-
     }
 
+
+    //模拟发送网络请求
+    class MySend implements Runnable {
+        JSONObject jsonData;
+        String key;
+
+        public MySend(JSONObject jsonData, String key) {
+            this.jsonData = jsonData;
+            this.key = key;
+        }
+
+        @Override
+        public void run() {
+
+            try {
+                Thread.sleep(500);
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

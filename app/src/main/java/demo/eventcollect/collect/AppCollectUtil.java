@@ -33,6 +33,8 @@ import demo.eventcollect.collect.collector.DataCollector;
 public class AppCollectUtil {
     private static final String TAG = "AppCollectUtil";
 
+    private boolean isSuccess;//是否成功
+
     /**
      * AppCollectUtil单例
      */
@@ -182,6 +184,7 @@ public class AppCollectUtil {
      */
     public void sendData(JSONArray array) {
 
+        //判断本地是否有
         mSender.sendData(array);
     }
 
