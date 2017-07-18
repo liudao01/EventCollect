@@ -33,7 +33,7 @@ reademe:
 
 **流程图**
 
-![流程图 ](https://raw.githubusercontent.com/liudao01/EventCollect/master/%E7%BB%9F%E8%AE%A1%E6%B5%81%E7%A8%8B%E5%9B%BE%20(1).png)
+ ![image](https://raw.githubusercontent.com/liudao01/EventCollect/master/%E7%BB%9F%E8%AE%A1%E6%B5%81%E7%A8%8B%E5%9B%BE%20(1).png)
 
 
 **上传的json数据**
