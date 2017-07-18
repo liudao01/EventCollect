@@ -147,11 +147,17 @@ public class DataSender {
         //判断本地是否有数据
         HashSet set = SPUtils.getSet();
 
-        for (Iterator<String> iter = set.iterator(); iter.hasNext(); ) {
-            String str = (String) iter.next();
-            LogUtil.d("本地数据key", str);
-            JSONObject asJSONObject = aCache.getAsJSONObject(str);
-            LogUtil.d("本地发送的数据 = " + asJSONObject.toString());
+        if (null != set) {
+
+            for (Iterator<String> iter = set.iterator(); iter.hasNext(); ) {
+                String str = (String) iter.next();
+                LogUtil.d("本地数据key", str);
+                JSONObject asJSONObject = aCache.getAsJSONObject(str);
+                if (null != asJSONObject) {
+                    LogUtil.d("本地发送的数据 = " + asJSONObject.toString());
+                    send(asJSONObject, str);
+                }
+            }
         }
         //
         JSONObject jsonData = new JSONObject();
@@ -170,7 +176,7 @@ public class DataSender {
         //发送数据
         LogUtil.d("最终发送的数据 = " + jsonData.toString());
         //这里联网请求数据
-
+        send(jsonData, "");
     }
 
     /**
@@ -203,11 +209,10 @@ public class DataSender {
     //发送 自己些网络发送的数据
     private void send(JSONObject jsonData, String key) {
 
-        boolean isSuccess = true;
-
         /*
         发送========== 成功 是本地 删除 不是本地 不管
          */
+        LogUtil.d("看下几次 key = "+key);
         MySend mySend = new MySend(jsonData, key);
         Thread thread = new Thread(mySend);
         thread.start();
@@ -349,6 +354,7 @@ public class DataSender {
     //模拟发送网络请求
     class MySend implements Runnable {
 
+        //自己定义的 上传成功或者失败
         boolean isSuccess = true;
         JSONObject jsonData;
         String key;
@@ -366,15 +372,26 @@ public class DataSender {
 
                 if (isSuccess) {
                     if (TextUtils.isEmpty(key)) {
-
+                        // 上传成功,不是本地上传的 不用管
+                        LogUtil.d("上传成功 普通不用管");
                     } else {
+                        //上传成功 并且是本地上传的
                         //删除本地数据
+                        LogUtil.d("上传成功 删除本地数据");
+                        aCache.remove(key);
                     }
 
                 } else {
                     if (TextUtils.isEmpty(key)) {
+                        // 上传不成功,不是本地上传的  存储
+                        long time = System.currentTimeMillis();
+                        SPUtils.addSet(String.valueOf(time));
+                        aCache.put(String.valueOf(time),jsonData);
 
+                        LogUtil.d("上传不成功,不是本地上传的  存储");
                     } else {
+                        // 上传不成功,是本地上传的  不用管
+                        LogUtil.d("上传不成功,是本地上传的  不用管");
 
                     }
 

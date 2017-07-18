@@ -146,7 +146,10 @@ public class SPUtils {
     }
 
     public static void addSet(String string) {
-        HashSet channelSet = new HashSet<String>();
+
+
+        HashSet set = getSet();
+        HashSet channelSet = new HashSet<String>(set);
         channelSet.add(string);
         editor.putStringSet(CHANNELSET, channelSet);
         editor.commit();
