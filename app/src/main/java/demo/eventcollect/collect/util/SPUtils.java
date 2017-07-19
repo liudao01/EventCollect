@@ -149,7 +149,12 @@ public class SPUtils {
 
 
         HashSet set = getSet();
-        HashSet channelSet = new HashSet<String>(set);
+        HashSet channelSet;
+        if(null!=set){
+            channelSet = new HashSet<String>(set);
+        }else{
+            channelSet = new HashSet<String>();
+        }
         channelSet.add(string);
         editor.putStringSet(CHANNELSET, channelSet);
         editor.commit();

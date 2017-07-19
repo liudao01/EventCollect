@@ -184,7 +184,6 @@ public class AppCollectUtil {
      */
     public void sendData(JSONArray array) {
 
-        //判断本地是否有
         mSender.sendData(array);
     }
 
