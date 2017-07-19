@@ -33,9 +33,17 @@ reademe:
 
 **演示操作 gif图有点大 :**
 
+我这里演示  模拟请求成功和请求失败的情况
+
+在DateSender类中MySend 线程 中控制请求成功和失败
+
+
+
 **第一种情况: 收集事件达到五次 上传数据成功的演示:**
 
  ![image](https://raw.githubusercontent.com/liudao01/EventCollect/master/%E4%BA%8B%E4%BB%B6%E6%94%B6%E9%9B%86.gif)
+ 
+ 
  
  
 **第二种情况: 收集事件达到五次 上传数据不成功的演示 存入本地:**
@@ -43,13 +51,13 @@ reademe:
  ![image](https://github.com/liudao01/EventCollect/blob/master/%E4%BA%8B%E4%BB%B6%E6%94%B6%E9%9B%86%E4%B8%8A%E4%BC%A0%E4%B8%8D%E6%88%90%E5%8A%9F.gif?raw=true)
  
  
+ 
+ 
 **第三种情况: 收集事件达到五次 上传数据成功 并且把以前未上传成功的数据一起上传:**
 
  ![image](https://github.com/liudao01/EventCollect/blob/master/%E4%BA%8B%E4%BB%B6%E6%94%B6%E9%9B%86%E4%B8%8A%E4%BC%A0%E6%88%90%E5%8A%9F%E5%92%8C%E6%9C%AC%E5%9C%B0%E7%9A%84%E4%B8%80%E8%B5%B7%E4%B8%8A%E4%BC%A0.gif?raw=true)
 
-我这里演示 成功和失败的情况  模拟请求成功和请求失败 
 
-在DateSender类中MySend 线程 中控制请求成功和失败
 
 
 
