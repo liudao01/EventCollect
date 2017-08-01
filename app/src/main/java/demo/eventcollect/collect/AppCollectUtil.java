@@ -130,30 +130,8 @@ public class AppCollectUtil {
     public void activityDataCollect(String activityName, String activityTitle, String activityTag,
                                     boolean isOpen, Context context, int from) {
 
-        int type = 0;
-        if (1 == from) {
 
-            if (sessionDepth == 0) {
-                // 从后台返回
-                LogUtil.d("从后台返回");
-                type = 1;
-            } else {
-                type = 0;
-            }
-            sessionDepth++;
-        }
-        if (2 == from) {
-            if (sessionDepth > 0)
-                sessionDepth--;
-            if (sessionDepth == 0) {
-                // 进入后台
-                LogUtil.d("进入后台");
-                type = 2;
-            } else {
-                type = 0;
-            }
-        }
-
+        int type = isBackstace(from);
         if (isOpen) {
             if (activityName.equals(mPrePageName)) { //同一个界面不可能启动两次，判断为重复接口
                 return;
@@ -172,19 +150,42 @@ public class AppCollectUtil {
                         activityCloseDataCollect(mArray, activityName, activityTitle, activityTag, type);
 
             }
-            bufferFullSend();
+            bufferFullSend(type);
         }
     }
 
+
+    private int isBackstace(int from) {
+        int type = 0;
+        if (1 == from) {
+
+            if (sessionDepth == 0) {
+                // 从后台返回
+                LogUtil.d("从后台返回");
+                type = 1;
+            }
+            sessionDepth++;
+        }
+        if (2 == from) {
+            if (sessionDepth > 0)
+                sessionDepth--;
+            if (sessionDepth == 0) {
+                // 进入后台
+                LogUtil.d("进入后台");
+                type = 2;
+            }
+        }
+        return type;
+    }
 
     /**
      * 发送数据接口
      *
      * @param array json动作列表
      */
-    public void sendData(JSONArray array) {
+    public void sendData(JSONArray array,int type) {
 
-        mSender.sendData(array);
+        mSender.sendData(array,type);
     }
 
     /**
@@ -261,7 +262,7 @@ public class AppCollectUtil {
     public void textViewInfoDataCollect(String id, String title, String tag, Context context) {
         synchronized (LOCK) {
             mArray = mCollector.textViewInfoDataCollect(id, title, tag, context.toString(), mArray);
-            bufferFullSend();
+            bufferFullSend(0);
         }
     }
 
@@ -278,7 +279,7 @@ public class AppCollectUtil {
         synchronized (LOCK) {
             mArray = mCollector.
                     imageViewPressDataCollect(imageId, title, tag, context.toString(), mArray);
-            bufferFullSend();
+            bufferFullSend(0);
         }
     }
 
@@ -329,7 +330,7 @@ public class AppCollectUtil {
     public void buttonPressDataCollect(String buttonId, String title, String tag, Context context) {
         synchronized (LOCK) {
             mArray = mCollector.buttonPressDataCollect(buttonId, title, tag, context.toString(), mArray);
-            bufferFullSend();
+            bufferFullSend(0);
         }
     }
 
@@ -344,7 +345,7 @@ public class AppCollectUtil {
     public void attributeCollect(String buttonId, String title, Context context) {
         synchronized (LOCK) {
             mArray = mCollector.attributeDataCollect(buttonId, title, context.toString(), mArray);
-            bufferFullSend();
+            bufferFullSend(0);
         }
     }
 
@@ -392,15 +393,15 @@ public class AppCollectUtil {
      * Json列表满dataSizeSend条随即发送
      * check whether the json array is full(10 pic)
      */
-    private void bufferFullSend() {
-        //判断是否
-
-        if (dataSizeSend <= mArray.length()) {
-            sendData(mArray);
+    private void bufferFullSend(int type) {
+        //判断是否列表满dataSizeSend条
+        if (dataSizeSend <= mArray.length() || 2 == type) {
+            sendData(mArray,type);
             //发送
-            LogUtil.d("发送数据 = " + mArray.toString());
+            LogUtil.d("type = "+type+"\n发送数据 = " + mArray.toString());
             mArray = null;
             mArray = new JSONArray();
         }
     }
+
 }

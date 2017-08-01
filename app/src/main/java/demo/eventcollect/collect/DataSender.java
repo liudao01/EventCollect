@@ -137,13 +137,54 @@ public class DataSender {
         mParams.put("UUID", getMyUUID());
     }
 
+//
+//    /**
+//     * 发送数据接口
+//     *
+//     * @param array json动作列表
+//     */
+//    public void sendData(JSONArray array) {
+//        //判断本地是否有数据
+//        HashSet set = SPUtils.getSet();
+//
+//        if (null != set) {
+//
+//            for (Iterator<String> iter = set.iterator(); iter.hasNext(); ) {
+//                String str = (String) iter.next();
+//                LogUtil.d("本地数据key", str);
+//                JSONObject asJSONObject = aCache.getAsJSONObject(str);
+//                if (null != asJSONObject) {
+//                    LogUtil.d("本地发送的数据 = " + asJSONObject.toString());
+//                    send(asJSONObject, str);
+//                }
+//            }
+//        }
+//        //
+//        JSONObject jsonData = new JSONObject();
+//        JSONObject userdata = putUserData();
+//        JSONObject session = putSession();
+//        mActionArray = array;
+//        try {
+//            jsonData.put("userData", userdata);
+//            jsonData.put("events", mActionArray);
+//            jsonData.put("session", session);
+//
+//
+//        } catch (JSONException e) {
+//            e.printStackTrace();
+//        }
+//        //发送数据
+//        LogUtil.d("最终发送的数据 = " + jsonData.toString());
+//        //这里联网请求数据
+//        send(jsonData, "");
+//    }
 
     /**
      * 发送数据接口
      *
      * @param array json动作列表
      */
-    public void sendData(JSONArray array) {
+    public void sendData(JSONArray array, int type) {
         //判断本地是否有数据
         HashSet set = SPUtils.getSet();
 
@@ -162,7 +203,7 @@ public class DataSender {
         //
         JSONObject jsonData = new JSONObject();
         JSONObject userdata = putUserData();
-        JSONObject session = putSession();
+        JSONObject session = putSession(type);
         mActionArray = array;
         try {
             jsonData.put("userData", userdata);
@@ -179,32 +220,6 @@ public class DataSender {
         send(jsonData, "");
     }
 
-    /**
-     * 发送数据接口
-     *
-     * @param array      json动作列表
-     * @param isLocation 是否是本地数据
-     */
-    public void sendData(JSONArray array, boolean isLocation) {
-        JSONObject jsonData = new JSONObject();
-        JSONObject userdata = putUserData();
-        JSONObject session = putSession();
-        mActionArray = array;
-        try {
-            jsonData.put("userData", userdata);
-            jsonData.put("events", mActionArray);
-            jsonData.put("session", session);
-
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        //发送数据
-        LogUtil.d("最终发送的数据 = " + jsonData.toString());
-        //这里联网请求数据
-        send(jsonData, "");
-
-    }
 
     //发送 自己些网络发送的数据
     private void send(JSONObject jsonData, String key) {
@@ -212,27 +227,57 @@ public class DataSender {
         /*
         发送========== 成功 是本地 删除 不是本地 不管
          */
-        LogUtil.d("看下几次 key = "+key);
+        LogUtil.d("看下几次 key = " + key);
         MySend mySend = new MySend(jsonData, key);
         Thread thread = new Thread(mySend);
         thread.start();
 
     }
 
-    //id 我随便写一个
-    private JSONObject putSession() {
-        JSONObject obj = new JSONObject();
+
+    //这里session 一系列判断
+    private JSONObject putSession(int type) {
+        JSONObject obj = null;
         try {
-            long time = System.currentTimeMillis();
-            if (!TextUtils.isEmpty(getUserid())) {
-                obj.put("id", time + "_" + getUserid());
+            if (2 == type) {
+                obj = aCache.getAsJSONObject("session");
+                aCache.remove("session");
             } else {
-                obj.put("id", time + "_" + getMyUUID());
+                obj = aCache.getAsJSONObject("session");
+                if (null != obj && !TextUtils.isEmpty(obj.toString())) {
+                    return obj;
+                } else {
+                    obj = getNewSession();
+                }
             }
-            obj.put("time", time);
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        return obj;
+    }
+
+    /**
+     * 创建新的session
+     *
+     * @return
+     * @throws JSONException
+     */
+    private JSONObject getNewSession() throws JSONException {
+
+
+        JSONObject obj = null;
+        obj = new JSONObject();
+        //session一次会话存储一次本地 time
+        long time = System.currentTimeMillis();
+        String id;
+        if (!"0".equals(getUserid())) { //id 我随便写一个
+            id = time + "_" + getUserid();
+        } else {
+            id = time + "_" + getMyUUID();
+        }
+        obj.put("id", id);
+        obj.put("time", time);
+        aCache.put("session", obj);
         return obj;
     }
 
@@ -261,7 +306,7 @@ public class DataSender {
                 }
             }
 //            paramObj.put("ca", array);
-            LogUtil.d("sendPost: " + paramObj.toString());
+            //LogUtil.d("sendPost: " + paramObj.toString());
             return paramObj;
         } catch (JSONException e) {
             e.printStackTrace();
@@ -386,7 +431,7 @@ public class DataSender {
                         // 上传不成功,不是本地上传的  存储
                         long time = System.currentTimeMillis();
                         SPUtils.addSet(String.valueOf(time));
-                        aCache.put(String.valueOf(time),jsonData);
+                        aCache.put(String.valueOf(time), jsonData);
 
                         LogUtil.d("上传不成功,不是本地上传的  存储");
                     } else {

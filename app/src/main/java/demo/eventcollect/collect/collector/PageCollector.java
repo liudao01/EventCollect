@@ -5,6 +5,8 @@ import android.util.Log;
 
 import org.json.JSONObject;
 
+import demo.eventcollect.collect.util.ACache;
+
 /**
  * activity页面行为收集
  * activity data obtaining
@@ -15,7 +17,7 @@ public class PageCollector {
     private String mTitle;
     private String mTag;
     private static PageCollector mInstance;
-
+    private ACache aCache;
     /**
      * 单例
      *
@@ -50,8 +52,12 @@ public class PageCollector {
                     object.put("type", "page");
                     break;
                 case 1:
+                    object.put("type", "app");
+                    //使用新session
+                    break;
                 case 2:
                     object.put("type", "app");
+                    //清除session
                     break;
                 default:
                     object.put("type", "page");
@@ -117,6 +123,9 @@ public class PageCollector {
                     object.put("type", "page");
                     break;
                 case 1:
+                    object.put("type", "app");
+
+                    break;
                 case 2:
                     object.put("type", "app");
                     break;
