@@ -7,9 +7,11 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import org.json.JSONArray;
@@ -82,6 +84,9 @@ public class AppCollectUtil {
     private DataSender mSender;
     //用于判断是否进入后台
     private static int sessionDepth = 0;
+
+
+    AdapterView.OnItemClickListener onItemClickListener = null;
 
     /**
      * 必须为单例，一个应用只存在一个实例。
@@ -183,9 +188,9 @@ public class AppCollectUtil {
      *
      * @param array json动作列表
      */
-    public void sendData(JSONArray array,int type) {
+    public void sendData(JSONArray array, int type) {
 
-        mSender.sendData(array,type);
+        mSender.sendData(array, type);
     }
 
     /**
@@ -230,7 +235,7 @@ public class AppCollectUtil {
                 try {
                     if (view instanceof CheckBox) {
                         CheckBox checkBox = (CheckBox) view;
-                        buttonPressDataCollect(checkBox.toString(), checkBox.isChecked() + "", (String) (checkBox.getTag()), context);
+                        checkBoxCheckDataCollect(checkBox.toString(), checkBox.isChecked() + "", (String) (checkBox.getTag()), context);
                     } else if (view instanceof Button) {
                         Button button = (Button) view;
                         buttonPressDataCollect(button.toString(), button.getText().toString(), (String) (button.getTag()), context);
@@ -240,6 +245,21 @@ public class AppCollectUtil {
                     } else if (view instanceof TextView) {
                         TextView text = (TextView) view;
                         textViewInfoDataCollect(text.toString(), text.getText().toString(), (String) (text.getTag()), context);
+                    } else if (view instanceof ListView) {
+
+                        final ListView text = (ListView) view;
+                        if (null == onItemClickListener) {
+                            onItemClickListener = text.getOnItemClickListener();
+                        }
+                        text.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                                LogUtil.d("监控条目的位置: " + position);
+
+                                onItemClickListener.onItemClick(null, view, position, id);
+                            }
+                        });
                     } else {
                         buttonPressDataCollect(view.toString(), null, null, context);
                     }
@@ -262,6 +282,22 @@ public class AppCollectUtil {
     public void textViewInfoDataCollect(String id, String title, String tag, Context context) {
         synchronized (LOCK) {
             mArray = mCollector.textViewInfoDataCollect(id, title, tag, context.toString(), mArray);
+            bufferFullSend(0);
+        }
+    }
+
+    /**
+     * 用户交互数据收集  按钮情况
+     * User data obtaining(Button);
+     *
+     * @param buttonId button的标志; button mark;
+     * @param title    button上的字面内容; button content;
+     * @param tag      button如果携带tag，收集tag; tag brought by button;
+     * @param context
+     */
+    public void checkBoxCheckDataCollect(String buttonId, String title, String tag, Context context) {
+        synchronized (LOCK) {
+            mArray = mCollector.checkBoxCheckDataCollect(buttonId, title, tag, context.toString(), mArray);
             bufferFullSend(0);
         }
     }
@@ -396,9 +432,9 @@ public class AppCollectUtil {
     private void bufferFullSend(int type) {
         //判断是否列表满dataSizeSend条
         if (dataSizeSend <= mArray.length() || 2 == type) {
-            sendData(mArray,type);
+            sendData(mArray, type);
             //发送
-            LogUtil.d("type = "+type+"\n发送数据 = " + mArray.toString());
+            LogUtil.d("type = " + type + "\n发送数据 = " + mArray.toString());
             mArray = null;
             mArray = new JSONArray();
         }

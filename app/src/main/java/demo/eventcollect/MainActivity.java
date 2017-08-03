@@ -3,9 +3,16 @@ package demo.eventcollect;
 import android.Manifest;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import demo.eventcollect.collect.LogUtil;
 import demo.eventcollect.collect.util.PermissionHelper;
@@ -21,11 +28,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
     private TextView textView;
     private Button button;
     private Button buttonActivity;
-    private ImageView image;
     private Button buttonAttribute;
+    private ImageView image;
 
+    private ListView listview;
 
+    ArrayAdapter arrayAdapter;
     PermissionHelper mHelper;
+    private List<String> itemList;//数据
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +51,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             }
         });
         getPermissiolList();
+        image = (ImageView) findViewById(R.id.image);
 
+        listview = (ListView) findViewById(R.id.listview);
+
+        initData();
         initView();
 
+    }
+
+    public void initData() {
+        itemList = new ArrayList<String>();
+        for (int i = 0; i < 20; i++) {
+            itemList.add("测试数据" + i);
+        }
     }
 
     private void getPermissiolList() {
@@ -75,8 +96,21 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
                 LogUtil.d("点击了图片");
             }
         });
-
         buttonActivity.setOnClickListener(this);
+
+
+        arrayAdapter = new ArrayAdapter<String>(MainActivity.this,
+                android.R.layout.simple_list_item_1, itemList);//适配器
+
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(MainActivity.this, "item点击" + position, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        listview.setAdapter(arrayAdapter);
+
     }
 
 
