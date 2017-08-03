@@ -247,19 +247,26 @@ public class AppCollectUtil {
                         textViewInfoDataCollect(text.toString(), text.getText().toString(), (String) (text.getTag()), context);
                     } else if (view instanceof ListView) {
 
-                        final ListView text = (ListView) view;
-                        if (null == onItemClickListener) {
-                            onItemClickListener = text.getOnItemClickListener();
-                        }
-                        text.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        final ListView list = (ListView) view;
+                        LogUtil.d("list  = " + list.toString());
+                        AdapterView.OnItemClickListener temp = list.getOnItemClickListener();
+                        LogUtil.d("temp = " + temp.toString());
+//                        if (null == onItemClickListener) {
+//                            onItemClickListener = list.getOnItemClickListener();
+//                        }
+                        onItemClickListener = list.getOnItemClickListener();
+                        LogUtil.d("befo  onItemClickListener = " + onItemClickListener.toString());
+
+                        AdapterView.OnItemClickListener AppCollectUtilListener = new AdapterView.OnItemClickListener() {
                             @Override
                             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
                                 LogUtil.d("监控条目的位置: " + position);
-
                                 onItemClickListener.onItemClick(null, view, position, id);
+                                list.setOnItemClickListener(onItemClickListener);
                             }
-                        });
+                        };
+                        list.setOnItemClickListener(AppCollectUtilListener);
+                        LogUtil.d("after  onItemClickListener = " + onItemClickListener.toString());
                     } else {
                         buttonPressDataCollect(view.toString(), null, null, context);
                     }

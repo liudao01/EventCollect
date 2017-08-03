@@ -94,6 +94,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener {
             @Override
             public void onClick(View v) {
                 LogUtil.d("点击了图片");
+                Toast.makeText(MainActivity.this, "点击了图片", Toast.LENGTH_SHORT).show();
             }
         });
         buttonActivity.setOnClickListener(this);
