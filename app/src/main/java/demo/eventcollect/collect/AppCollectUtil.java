@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -66,6 +67,7 @@ public class AppCollectUtil {
      */
     private Stack<View> mViewStack;
 
+
     /**
      * 行为JSON列表。
      * List of JSON used for user behaviors
@@ -86,7 +88,13 @@ public class AppCollectUtil {
     private static int sessionDepth = 0;
 
 
+    //监听器
     AdapterView.OnItemClickListener onItemClickListener = null;
+
+    //滚动状态
+    private int myScrollState = -1;
+    private View firstDown;
+
 
     /**
      * 必须为单例，一个应用只存在一个实例。
@@ -202,18 +210,24 @@ public class AppCollectUtil {
      * @param context
      */
     public void recognizeViewEvent(MotionEvent ev, View myView, Context context) {
+
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN: {
+                LogUtil.d("==================================== MotionEvent.ACTION_DOWN");
+                myScrollState = -1;
+
                 try {
                     mViewStack = new Stack<>();
                     final float pressX = ev.getRawX();
                     final float pressY = ev.getRawY();
                     findViewAtPosition(myView, (int) pressX, (int) pressY);
                     if (mViewStack.isEmpty()) {
+                        firstDown = null;
                         return;
                     }
+                    firstDown = mViewStack.peek();
+                    LogUtil.d("action downview = " + firstDown);
 
-                    //  mInitialView = ignoreView();
                 } catch (Exception e) {
                     Log.e(TAG, "recognizeViewEvent: unknown error");
                 }
@@ -221,6 +235,7 @@ public class AppCollectUtil {
                 break;
             }
             case MotionEvent.ACTION_UP: {
+                LogUtil.d("====================================MotionEvent.ACTION_UP");
                 mViewStack = new Stack<View>();
                 final float x = ev.getRawX();
                 final float y = ev.getRawY();
@@ -228,10 +243,18 @@ public class AppCollectUtil {
                 if (mViewStack.isEmpty()) {
                     return;
                 }
+
                 View view = ignoreView();
+                if (!mViewStack.isEmpty() && mViewStack.size() != 0) {
+                    View actionup = mViewStack.get(0);
+                    LogUtil.d("action actionup = " + actionup);
+                    LogUtil.d("view = " + view);
+
+                }
                 if (null == view) {
                     return;
                 }
+
                 try {
                     if (view instanceof CheckBox) {
                         CheckBox checkBox = (CheckBox) view;
@@ -246,27 +269,63 @@ public class AppCollectUtil {
                         TextView text = (TextView) view;
                         textViewInfoDataCollect(text.toString(), text.getText().toString(), (String) (text.getTag()), context);
                     } else if (view instanceof ListView) {
-
-                        final ListView list = (ListView) view;
-                        LogUtil.d("list  = " + list.toString());
-                        AdapterView.OnItemClickListener temp = list.getOnItemClickListener();
-                        LogUtil.d("temp = " + temp.toString());
-//                        if (null == onItemClickListener) {
+                        //按下的地方和抬起的地方不是一个控件, 还需要 判断up事件之前listview 有没有滑动
+                        if (null == firstDown || firstDown != view) {
+                            LogUtil.d("按下的地方和抬起的地方不是一个控件");
+                        } else {
+                            //firstDown = null;
+                            final ListView list = (ListView) view;
+                            LogUtil.d("list  = " + list.toString());
+//                        AdapterView.OnItemClickListener temp = list.getOnItemClickListener();
+//                        LogUtil.d("temp = " + temp.toString());
+//                        if (null == onItemClickListener || temp != onItemClickListener) {
 //                            onItemClickListener = list.getOnItemClickListener();
 //                        }
-                        onItemClickListener = list.getOnItemClickListener();
-                        LogUtil.d("befo  onItemClickListener = " + onItemClickListener.toString());
+                            onItemClickListener = list.getOnItemClickListener();
+                            LogUtil.d("befo  监听接口 = " + onItemClickListener.toString());
 
-                        AdapterView.OnItemClickListener AppCollectUtilListener = new AdapterView.OnItemClickListener() {
-                            @Override
-                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                LogUtil.d("监控条目的位置: " + position);
-                                onItemClickListener.onItemClick(null, view, position, id);
-                                list.setOnItemClickListener(onItemClickListener);
+                            //滚动监听
+                            list.setOnScrollListener(new AbsListView.OnScrollListener() {
+                                @Override
+                                public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+                                    myScrollState = scrollState;
+                                    LogUtil.d("onScrollStateChanged = " + myScrollState);
+                                    if (myScrollState == 0) {
+                                        myScrollState = -1;
+                                    }
+
+                                }
+
+                                @Override
+                                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+                                }
+                            });
+                            if ((myScrollState == -1)) {
+
+                                AdapterView.OnItemClickListener AppCollectUtilListener = new AdapterView.OnItemClickListener() {
+                                    @Override
+                                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                        LogUtil.d("监控条目的位置: " + position);
+                                        onItemClickListener.onItemClick(parent, view, position, id);
+                                        list.setOnItemClickListener(onItemClickListener);
+                                    }
+                                };
+
+                                //判断如果是滑动的话就不给他设置
+
+                                list.setOnItemClickListener(AppCollectUtilListener);
+                                LogUtil.d("myScrollState = " + myScrollState);
+                                //当滑动停止的时候在让他设置
+//                            if (myScrollState == 0) {
+//                                myScrollState = -1;
+//                            }
+//                        LogUtil.d("state  myScrollState = " + myScrollState);
+                                LogUtil.d("after onItemClickListener 监听接口 = " + onItemClickListener.toString());
+                                LogUtil.d("after  实时获取 监听接口 = " + list.getOnItemClickListener().toString());
                             }
-                        };
-                        list.setOnItemClickListener(AppCollectUtilListener);
-                        LogUtil.d("after  onItemClickListener = " + onItemClickListener.toString());
+                        }
                     } else {
                         buttonPressDataCollect(view.toString(), null, null, context);
                     }
