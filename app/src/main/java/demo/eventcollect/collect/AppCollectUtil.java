@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -91,8 +90,6 @@ public class AppCollectUtil {
     //监听器
     AdapterView.OnItemClickListener onItemClickListener = null;
 
-    //滚动状态
-    private int myScrollState = -1;
     private View firstDown;
 
 
@@ -214,7 +211,6 @@ public class AppCollectUtil {
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN: {
                 LogUtil.d("==================================== MotionEvent.ACTION_DOWN");
-                myScrollState = -1;
 
                 try {
                     mViewStack = new Stack<>();
@@ -227,7 +223,6 @@ public class AppCollectUtil {
                     }
                     firstDown = mViewStack.peek();
                     LogUtil.d("action downview = " + firstDown);
-
                 } catch (Exception e) {
                     Log.e(TAG, "recognizeViewEvent: unknown error");
                 }
@@ -276,55 +271,7 @@ public class AppCollectUtil {
                             //firstDown = null;
                             final ListView list = (ListView) view;
                             LogUtil.d("list  = " + list.toString());
-//                        AdapterView.OnItemClickListener temp = list.getOnItemClickListener();
-//                        LogUtil.d("temp = " + temp.toString());
-//                        if (null == onItemClickListener || temp != onItemClickListener) {
-//                            onItemClickListener = list.getOnItemClickListener();
-//                        }
-                            onItemClickListener = list.getOnItemClickListener();
-                            LogUtil.d("befo  监听接口 = " + onItemClickListener.toString());
 
-                            //滚动监听
-                            list.setOnScrollListener(new AbsListView.OnScrollListener() {
-                                @Override
-                                public void onScrollStateChanged(AbsListView view, int scrollState) {
-
-                                    myScrollState = scrollState;
-                                    LogUtil.d("onScrollStateChanged = " + myScrollState);
-                                    if (myScrollState == 0) {
-                                        myScrollState = -1;
-                                    }
-
-                                }
-
-                                @Override
-                                public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-
-                                }
-                            });
-                            if ((myScrollState == -1)) {
-
-                                AdapterView.OnItemClickListener AppCollectUtilListener = new AdapterView.OnItemClickListener() {
-                                    @Override
-                                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                                        LogUtil.d("监控条目的位置: " + position);
-                                        onItemClickListener.onItemClick(parent, view, position, id);
-                                        list.setOnItemClickListener(onItemClickListener);
-                                    }
-                                };
-
-                                //判断如果是滑动的话就不给他设置
-
-                                list.setOnItemClickListener(AppCollectUtilListener);
-                                LogUtil.d("myScrollState = " + myScrollState);
-                                //当滑动停止的时候在让他设置
-//                            if (myScrollState == 0) {
-//                                myScrollState = -1;
-//                            }
-//                        LogUtil.d("state  myScrollState = " + myScrollState);
-                                LogUtil.d("after onItemClickListener 监听接口 = " + onItemClickListener.toString());
-                                LogUtil.d("after  实时获取 监听接口 = " + list.getOnItemClickListener().toString());
-                            }
                         }
                     } else {
                         buttonPressDataCollect(view.toString(), null, null, context);
