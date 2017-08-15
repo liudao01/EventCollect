@@ -23,7 +23,7 @@ public class BaseActivity extends Activity  implements IActivity {
         super.onCreate(savedInstanceState);
         startIntent = new Intent();
         //工具初始化
-        appCollectUtil = AppCollectUtil.getInstance();
+        appCollectUtil = AppCollectUtil.getInstance(getApplicationContext());
         appCollectUtil.init(getApplication());
     }
 
@@ -62,7 +62,7 @@ public class BaseActivity extends Activity  implements IActivity {
 //        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss:SSS");
 //        String date = sdf.format(new java.util.Date());
 //        LogUtil.d("开始时间 : " + date);
-        appCollectUtil.getInstance().recognizeViewEvent(ev, this.getWindow().getDecorView(), this);
+        appCollectUtil.getInstance(getApplicationContext()).recognizeViewEvent(ev, this.getWindow().getDecorView(), this);
 //        SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss:SSS");
 //        String date2 = sdf2.format(new java.util.Date());
 //        LogUtil.d("结束时间 : " + date2);//自己项目测试大约1 - 8毫秒 可以接受

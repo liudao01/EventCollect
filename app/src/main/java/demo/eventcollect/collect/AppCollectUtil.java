@@ -35,6 +35,8 @@ import demo.eventcollect.collect.collector.DataCollector;
 public class AppCollectUtil {
     private static final String TAG = "AppCollectUtil";
 
+    private Context mContext;
+
     private boolean isSuccess;//是否成功
 
     /**
@@ -98,10 +100,10 @@ public class AppCollectUtil {
      *
      * @return Queen实例
      */
-    public static AppCollectUtil getInstance() {
-        if (sInstance == null) {
-            sInstance = new AppCollectUtil();
-        }
+        public static AppCollectUtil getInstance(Context context) {
+            if (sInstance == null) {
+                sInstance = new AppCollectUtil(context);
+            }
         return sInstance;
     }
 
@@ -109,11 +111,12 @@ public class AppCollectUtil {
      * app工具类初始化
      * Initiation of Queen;
      */
-    private AppCollectUtil() {
+    private AppCollectUtil(Context context) {
         mCollector = new DataCollector();
         mArray = new JSONArray();
         mViewStack = new Stack<View>();
         mAvoidListView = new ArrayList<>();//用于储存要规避的View；
+        mContext = context.getApplicationContext();
 //        mObserved = new Observed();
     }
 
