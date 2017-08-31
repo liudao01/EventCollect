@@ -42,7 +42,7 @@ public class AppCollectUtil {
     /**
      * AppCollectUtil单例
      */
-    private static AppCollectUtil sInstance;
+//    private static AppCollectUtil sInstance;
     /**
      * 数据存入几条后发送
      */
@@ -95,30 +95,42 @@ public class AppCollectUtil {
     private View firstDown;
 
 
+
+    private enum MyEnumSingleton{
+        INSTANCE;
+        private AppCollectUtil appCollectUtil;
+        private MyEnumSingleton(){
+            appCollectUtil = new AppCollectUtil();
+        }
+
+        public AppCollectUtil getResource(){
+            return appCollectUtil;
+        }
+    }
+
+    public static AppCollectUtil getInstance(){
+        return MyEnumSingleton.INSTANCE.getResource();
+    }
     /**
      * 必须为单例，一个应用只存在一个实例。
      *
      * @return Queen实例
      */
-        public static AppCollectUtil getInstance(Context context) {
-            if (sInstance == null) {
-                sInstance = new AppCollectUtil(context);
-            }
-        return sInstance;
-    }
+//        public static AppCollectUtil getInstance(Context context) {
+//            if (sInstance == null) {
+//                sInstance = new AppCollectUtil(context);
+//            }
+//        return sInstance;
+//    }
 
     /**
      * app工具类初始化
      * Initiation of Queen;
      */
-    private AppCollectUtil(Context context) {
-        mCollector = new DataCollector();
-        mArray = new JSONArray();
-        mViewStack = new Stack<View>();
-        mAvoidListView = new ArrayList<>();//用于储存要规避的View；
-        mContext = context.getApplicationContext();
-//        mObserved = new Observed();
-    }
+//    private AppCollectUtil(Context context) {
+//
+////        mObserved = new Observed();
+//    }
 
     /**
      * 初始化一些数据
@@ -126,6 +138,12 @@ public class AppCollectUtil {
      * @param application
      */
     public void init(Application application) {
+        mCollector = new DataCollector();
+        mArray = new JSONArray();
+        mViewStack = new Stack<View>();
+        mAvoidListView = new ArrayList<>();//用于储存要规避的View；
+        mContext = application;
+
         mSender = new DataSender(application);
     }
 
