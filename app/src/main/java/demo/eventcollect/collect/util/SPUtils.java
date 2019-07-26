@@ -145,14 +145,28 @@ public class SPUtils {
         return resArray;
     }
 
+    public static void removeSet(String string) {
+        HashSet set = getSet();
+        HashSet channelSet;
+        if (null != set) {
+            channelSet = new HashSet<String>(set);
+        } else {
+            channelSet = new HashSet<String>();
+        }
+        channelSet.remove(string);
+        editor.putStringSet(CHANNELSET, channelSet);
+        editor.commit();
+
+    }
+
     public static void addSet(String string) {
 
 
         HashSet set = getSet();
         HashSet channelSet;
-        if(null!=set){
+        if (null != set) {
             channelSet = new HashSet<String>(set);
-        }else{
+        } else {
             channelSet = new HashSet<String>();
         }
         channelSet.add(string);

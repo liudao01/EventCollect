@@ -423,6 +423,7 @@ public class DataSender {
                         //上传成功 并且是本地上传的
                         //删除本地数据
                         LogUtil.d("上传成功 删除本地数据");
+                        SPUtils.remove(MyApplication.getContext(),key);
                         aCache.remove(key);
                     }
 
